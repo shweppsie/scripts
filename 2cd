@@ -1,0 +1,59 @@
+#!/usr/bin/python
+
+import tempfile, shutil, sys, glob, subprocess
+
+def usage():
+	print "Usage: %s folder" % sys.argv[0]
+	sys.exit(3)
+
+if len(sys.argv) != 2:
+	usage()
+
+files = glob.glob("%s/*.mp3" % sys.argv[1])
+files.extend(glob.glob("%s/*.flac" % sys.argv[1]))
+files.extend(glob.glob("%s/*.ogg" % sys.argv[1]))
+
+tempdir = tempfile.mkdtemp()
+
+#copy files to the temp directory
+for i in files:
+	print "copying %s" % i
+	shutil.copy2(i, tempdir+'/')
+
+#decode mp3 files
+files = glob.glob("%s/*.mp3" % tempdir)
+for i in files:
+	print "decoding %s" % i
+	if subprocess.call(["lame", "--decode",i], stdout=sys.stdout, stderr=sys.stderr) != 0:
+			print "An error occured while decoding: %s" % i
+			shutil.rmtree(tempdir)
+			sys.exit(1)
+
+#decode flac files
+files = glob.glob("%s/*.flac" % tempdir)
+for i in files:
+	print "decoding %s" % i
+	if subprocess.call(["flac", "--decode",i], stdout=sys.stdout, stderr=sys.stderr) != 0:
+			print "An error occured while decoding: %s" % i
+			shutil.rmtree(tempdir)
+			sys.exit(1)
+
+#decode ogg files
+files = glob.glob("%s/*.ogg" % tempdir)
+for i in files:
+	print "decoding %s" % i
+	if subprocess.call(["oggdec",i], stdout=sys.stdout, stderr=sys.stderr) != 0:
+			print "An error occured while decoding: %s" % i
+			shutil.rmtree(tempdir)
+			sys.exit(1)
+
+files = glob.glob("%s/*.wav" % tempdir)
+
+files.sort()
+
+command = ['wodim','-pad','-audio']
+command.extend(files)
+
+subprocess.Popen(command, stdout=sys.stdout, stderr=sys.stderr).communicate()
+
+shutil.rmtree(tempdir)

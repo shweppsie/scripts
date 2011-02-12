@@ -1,0 +1,10 @@
+<dvdauthor>
+  <vmgm />
+    <titleset>
+      <titles>
+        <pgc>
+          <vob file="output.mpg" />
+        </pgc>
+      </titles>
+    </titleset>
+</dvdauthor>
