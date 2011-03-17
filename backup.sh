@@ -43,7 +43,7 @@ LOGPATH="${LOGDIR}/${DATE}.log"
 exec 1>>"${LOGPATH}"
 #exec 2>&1
 
-echo "${DATE}: ${BACKUP_TYPE} BACKUP OF ${BACKUP_NAME}" | tr '[:lower:]' '[:upper:]'
+echo "`date`: ${BACKUP_TYPE} BACKUP OF ${BACKUP_NAME}" | tr '[:lower:]' '[:upper:]'
 
 echo "Waiting for lockfile to become free..."
 i=0
@@ -147,5 +147,4 @@ if [ -e $LOCKFILE ]; then
 	rm $LOCKFILE
 fi
 
-DATE=`date +%y.%m.%d`
-echo "${DATE}: BACKUP COMPLETE"
+echo "`date`: BACKUP COMPLETE"
