@@ -43,6 +43,12 @@ LOGPATH="${LOGDIR}/${DATE}.log"
 exec 1>>"${LOGPATH}"
 #exec 2>&1
 
+#lower the class of the whole shell
+/usr/bin/ionice -c3 -p$$
+
+#and nice this shell too
+/usr/bin/renice -n 10 -p$$
+
 echo "`date`: ${BACKUP_TYPE} BACKUP OF ${BACKUP_NAME}" | tr '[:lower:]' '[:upper:]'
 
 echo "Waiting for lockfile to become free..."
@@ -84,7 +90,7 @@ case "$BACKUP_TYPE" in
 
 		if [ "${LASTBACKUP}" != "${BACKUP_DIR}/daily/" ]; then
 			echo "Hardlinking most recent backup: ${LASTBACKUP}"
-			ionice -c 3 cp -al "${LASTBACKUP}" "${TMPBACKUP}" 2>&1
+			cp -al "${LASTBACKUP}" "${TMPBACKUP}" 2>&1
 			if [ $? -ne 0 ]; then
 				"ERROR: cp Failed" | tee -a "${LOGPATH}" >&2
 				rm $LOCKFILE
@@ -107,7 +113,7 @@ case "$BACKUP_TYPE" in
 			echo "Begginning rsync with no exclude file"
 			exclude=""
 		fi
-		ionice -c 3 rsync -a --delete --exclude-from="${exclude}" "${SRC}" "${TMPBACKUP}" 2>&1
+		rsync -a --delete --exclude-from="${exclude}" "${SRC}" "${TMPBACKUP}" 2>&1
 		if [ $? -ne 0 ]; then
 			echo "ERROR: rsync Failed with return code: $?" | tee -a "${LOGPATH}" >&2
 			rm $LOCKFILE
