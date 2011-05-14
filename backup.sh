@@ -71,7 +71,7 @@ fi
 
 LASTBACKUP="${BACKUP_DIR}/daily/`ls -t ${BACKUP_DIR}/daily/ | head -n 1`"
 
-case "$BACKUP_TYPE" in
+case "${BACKUP_TYPE}" in
 	daily)
 		if [ $# -ne 3 ]; then
 			usage
@@ -137,12 +137,11 @@ case "$BACKUP_TYPE" in
 		cp -al "${LASTBACKUP}" "${NEWBACKUP}" 2>&1
 		if [ $? -ne 0 ]; then
 			"ERROR: cp Failed" | tee -a "${LOGPATH}" >&2
-			rm $LOCKFILE
+			rm ${LOCKFILE}
 			exit $?
 		fi
 
-
-		remove_old_backups ${2}
+		remove_old_backups ${BACKUP_TYPE}
 	;;
 	*)
 		usage
