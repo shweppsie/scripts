@@ -47,7 +47,7 @@ exec 1>>"${LOGPATH}"
 /usr/bin/ionice -c3 -p$$
 
 #and nice this shell too
-/usr/bin/renice -n 10 -p$$
+/usr/bin/renice -n 10 -p $$
 
 echo "`date`: ${BACKUP_TYPE} BACKUP OF ${BACKUP_NAME}" | tr '[:lower:]' '[:upper:]'
 
