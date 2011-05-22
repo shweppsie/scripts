@@ -56,7 +56,7 @@ def ezrss(data,last_updated):
 
 func_mapper = [ 
 	{
-		'url':'^http://www.ezrss.it/search/index.php\?(&?((show_name|show_name_exact|date|quality|release_group)=[^&]*|mode=rss))*$',
+		'url':r'^http://www.ezrss.it/search/index.php\?(&?((show_name|show_name_exact|date|quality|quality_exact|release_group)=[^&]*|mode=rss))*$',
 		'func':ezrss
 	},{
 		'url':r'^http://showrss.karmorra.info/feeds/[0-9]*.rss',
