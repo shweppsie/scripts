@@ -96,19 +96,13 @@ def _add_torrent(torrent):
 	elif errors != "":
 		raise AddTorrentException(errors)
 
-def _2epoch(data):
-	return calendar.timegm(data)
-
-def _2time(data):
-	return time.gmtime(data)
-
 def check_feeds():
 	data = _read_datafile()
 	for key in data:
 		feed = data[key]
 		name = key
 		url = feed['url']
-		last_updated = _2time(feed['last_updated'])
+		last_updated = time.gmtime(feed['last_updated'])
 		
 		# go fetch the rss feed
 		rss = feedparser.parse(url)
@@ -126,8 +120,8 @@ def check_feeds():
 						data[name]['status'] = str(e)
 						_write_datafile(data)
 						raise
-				data[name]['last_updated'] = _2epoch(time.gmtime())
-				data[name]['status'] = 'updated last %s' % time.strftime("on the %d %b %Y at %H:%M:%S", time.localtime(_2epoch(last_updated)))
+				data[name]['last_updated'] = time.time()
+				data[name]['status'] = 'updated last %s' % time.strftime("on the %d %b %Y at %H:%M:%S", time.localtime())
 				break
 		if not matched:
 			data[name]['status'] = 'url matches no known rss torrent services'
@@ -136,7 +130,7 @@ def check_feeds():
 
 def add_feed(name,url):
 	data = _read_datafile()
-	data[name] = { 'url':url, 'status':'Feed never checked', last_updated:_2epoch( time.gmtime() ) }
+	data[name] = { 'url':url, 'status':'Feed never checked', 'last_updated': time.time() }
 	_write_datafile(data)
 
 def remove_feed(info):
