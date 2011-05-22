@@ -133,6 +133,22 @@ def add_feed(name,url):
 	data[name] = { 'url':url, 'status':'Feed never checked', 'last_updated': time.time() }
 	_write_datafile(data)
 
+def reset_feed(name):
+	data = _read_datafile()
+	try:
+		data[name]['last_updated'] = 0
+		data[name]['status'] = 'feed has been reset'
+		_write_datafile(data)
+		return
+	except:
+		for i in data:
+			if info == data[i]['url']:
+				data[i]['last_updated'] = 0
+				data[i]['status'] = 'feed has been reset'
+				_write_datafile(data)
+				return
+	raise NoSuchFeedException(info)
+
 def remove_feed(info):
 	data = _read_datafile()
 	try:
@@ -162,6 +178,9 @@ def list_feeds():
 def arg_add(args):
 	add_feed(args.name, args.url)
 
+def arg_reset(args):
+	reset_feed(args.info)
+
 def arg_remove(args):
 	remove_feed(args.info)
 
@@ -180,6 +199,10 @@ def main():
 	add_parser.add_argument('name',help='name this feed')
 	add_parser.add_argument('url',help='url to rss feed')
 	add_parser.set_defaults(func=arg_add)
+	reset_parser = subparsers.add_parser('reset', help='cause the next check to download all previous torrents on a feed')
+	reset_parser.add_argument('info',metavar='(name|url)',
+			help='name or url of feed to reset')
+	reset_parser.set_defaults(func=arg_reset)
 	remove_parser = subparsers.add_parser('remove', 
 			help='remove a feed via it\'s name or url')
 	remove_parser.add_argument('info',metavar='(name|url)',
