@@ -47,5 +47,10 @@ do
 done
 
 echo "Removing Empty Directories"
-find -depth -type d -empty -exec echo {}\; rmdir {} \;
+if [ $DRYRUN -eq 0 ]
+then
+	find -depth -type d -empty -print0 | xargs --no-run-if-empty -0 rmdir --verbose
+else
+	find -depth -type d -empty -exec echo Deletable {} \;
+fi
 echo "Done"
