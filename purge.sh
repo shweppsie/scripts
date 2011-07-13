@@ -3,6 +3,7 @@
 if [[ "$1" = "" ]]
 then
 	echo "Usage: purge [-d] DIRECTORY"
+	exit 1
 fi
 
 DRYRUN=0
