@@ -89,7 +89,7 @@ def _write_datafile(data):
 
 def _add_torrent(torrent):
 	import subprocess,sys
-	args = ["/usr/local/bin/transmission-remote","-a","%s" % torrent]
+	args = ["/usr/local/bin/transmission-remote","donbot","-a","%s" % torrent]
 	(output,errors) = subprocess.Popen(args, stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
 	if output != "" and not output.find('success'):
 		raise AddTorrentException(output.split(': ',1)[1].replace("\"",""))
