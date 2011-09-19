@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$1" == "" ]; then
+	echo "$0 <text file>"
+	echo "$0 <text>"
+	exit 1
+fi
+
 if [ -e "$1" ]; then
 	curl -d paste_code="`cat <($1)`" http://pastebin.com/api_public.php
 else
