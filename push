@@ -1,0 +1,54 @@
+#!/bin/bash
+
+destination="/sdcard/Music"
+
+adb_status=`pidof adb | wc -l`
+if [ $adb_status -eq 0 ]; then
+	echo "adb not running. Please start adb and re-run this script."
+	exit 1
+fi
+
+if [ "$1" == "" -o "$2" == "" ]; then
+	echo "Usage: $0 (album|other) <album folder>"
+	exit 1
+fi
+
+process="$1"
+source_dir="$2"
+
+count=`ls "$source_dir" | wc -l`
+if [ $count -le 3 ]; then
+	echo "Error: only $count files found, something doesn't feel right"
+	exit 1
+fi
+
+if [ "$process" == "album" ]; then
+	album=`basename "$source_dir"`
+
+	artist=`dirname "$source_dir"`
+	artist=`basename "$artist"`
+
+	if [ "$artist" == "" -o "$album" == "" ]; then
+		echo "Error: cannot determine artist or album"
+		exit 1
+	fi
+
+	destination="$destination/$artist - $album"
+elif [ "$process" == "other" ]; then
+	folder=`basename "$source_dir"`
+	destination="$destination/$folder"
+else
+	echo "Error: I don't understand $process"
+	exit 1
+fi
+
+echo "Destination: $destination"
+
+adb -d shell mkdir -p "$destination" >> /dev/null
+
+ls "$source_dir" | while read line; do
+	echo -n "copying $line..."
+	output=`adb push "$source_dir/$line" "$destination/$output_dir/$line" 2>&1`
+	echo "done [$output]"
+done
+
