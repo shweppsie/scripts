@@ -14,7 +14,9 @@ if [ "$1" == "" -o "$2" == "" ]; then
 fi
 
 process="$1"
-source_dir="$2"
+source_dir="`cd \"$2\"; pwd`"
+
+echo "Source: $source_dir"
 
 count=`ls "$source_dir" | wc -l`
 if [ $count -le 3 ]; then
