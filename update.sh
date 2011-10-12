@@ -21,14 +21,9 @@ find ./ -maxdepth 1 -mindepth 1 -type d | while read LINE; do
 		echo -n " from github.com"
 	fi
 
-	out=`cat .git/config | grep "git.futurama.mine.nu"`
+	out=`cat .git/config | grep "git.shweppsie.com"`
 	if [ $? -eq 0 ]; then
-		echo -n " from git.futurama.mine.nu"
-	fi
-
-	out=`cat .git/config | grep "zoidberg"`
-	if [ $? -eq 0 ]; then
-		echo -n " from zoidberg"
+		echo -n " from git.shweppsie.com"
 	fi
 
 	echo "..."
