@@ -14,7 +14,7 @@ find ./ -maxdepth 1 -mindepth 1 -type d | while read LINE; do
 		continue
 	fi
 
-	echo -n "Updating $LINE"
+	echo -n "Processing $LINE"
 
 	out=`cat .git/config | grep "github.com"`
 	if [ $? -eq 0 ]; then
