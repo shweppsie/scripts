@@ -28,7 +28,7 @@ find ./ -maxdepth 1 -mindepth 1 -type d | while read LINE; do
 
 	echo "..."
 
-	git pull
+	#git pull
 	git status | grep -oE "(modified: .*|Your branch is ahead of .*)"
 	echo ""
 	cd ..
