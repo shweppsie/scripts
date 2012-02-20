@@ -19,11 +19,12 @@
 # backups.
 
 import sys, os
+from operator import itemgetter
 
 class Links:
 	def __init__(self):
 		self._links = {}
-		self._offenders = {}
+		self._offenders = []
 
 	def __str__(self):
 		string = ""
@@ -32,15 +33,28 @@ class Links:
 			l = self._links[i]
 			string += "%s files shared %s links with another file which totalled %s\n" % (l[0], i-1, sizeof_fmt(l[1]))
 			total += l[1]
-		string += "Files Total: %s" % sizeof_fmt(total)
+		string += "Files Total: %s\n\n" % sizeof_fmt(total)
+		string += "Top 10 offending files are:\n"
+		for a in xrange(len(self._offenders)):
+			i = self._offenders[a]
+			string += "%d. %s - %s - %s\n" % (a, i[0], sizeof_fmt(i[1]), i[2])
 		return string
 
-	def add(self, link, bytes):
+	def add(self, link, size, name):
+		if len(self._offenders) != 0:
+			last_offender = self._offenders[len(self._offenders)-1]
+		if len(self._offenders) <= 10 or (links < last_offender[0] and size > last_offender[1]):
+			if len(self._offenders) > 10:
+				self._offenders.pop()
+			self._offenders.append((link, size, name))
+			self._offenders = sorted(self._offenders, key=itemgetter(1))
+			self._offenders = sorted(self._offenders, key=itemgetter(0), reverse=True)
+
 		if link not in self._links:
-			self._links[link] = [1,bytes]
+			self._links[link] = [1,size]
 		else:
 			self._links[link][0] += 1
-			self._links[link][1] += bytes
+			self._links[link][1] += size
 
 def sizeof_fmt(num):
 	for x in ['bytes','KB','MB','GB','TB']:
@@ -62,6 +76,6 @@ for directory in sys.argv[1:]:
 			if os.path.islink(f):
 				continue
 			s = os.stat(f)
-			links.add(s.st_nlink,s.st_size)
+			links.add(s.st_nlink,s.st_size,f)
 
 	print str(links)
