@@ -2,7 +2,7 @@
 
 LOCKFILE="/var/lock/backup.lock"
 LOGDIR="/var/log/backup"
-BACKUP_DIR="/stuff/backup"
+BACKUP_DIR="/backup"
 
 function usage {
 	echo "$0 name daily source"
