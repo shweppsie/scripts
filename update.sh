@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /src
+cd ~/src
 
 find ./ -maxdepth 1 -mindepth 1 -type d | while read LINE; do
 	cd "$LINE";
