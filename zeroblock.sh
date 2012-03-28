@@ -1,0 +1,28 @@
+#!/bin/bash
+
+function usage {
+	echo "Usage: ./fixdisk lba_of_error disk"
+	exit 1
+}
+
+if [ $UID -ne 0 ]; then
+	echo "You are not root!"
+	exit 1
+fi
+
+if [ $# -ne 2 ]; then
+	usage
+fi
+
+block_num="$1"
+disk="$2"
+
+echo "Ready to overwrite block ${block_num} on disk ${disk} with zeros."
+echo "Are you 110% sure you want to do this? (Y/N)?"
+read answer
+
+if [ ${answer} == "Y" ]; then
+	echo "Writing Zeros to block"
+	dd bs=4096 seek=$((${block_num}/8)) count=1 if=/dev/zero of=${disk}
+fi
+
