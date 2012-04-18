@@ -14,6 +14,7 @@ start = """
 	</head>
 	<body>
 """
+# Don't modify end unless you know what you're doing!!!
 end = """
 	</body>
 </html>
@@ -200,9 +201,13 @@ for channel in channels:
 			out_file = open(filename,'w')
 			out_file.write(start)
 		else:
-			out_file = open(filename,'a')
-			#seek back before the end text
-			out_file.seek((len(end))*(-1), os.SEEK_END)
+			out_file = open(filename,'rw+')
+			# seek back before the end text
+			out_file.seek(len(end)*(-1), os.SEEK_END)
+			# truncate off the old file ending
+			out_file.truncate()
+			# make sure we're at the end of the file
+			out_file.seek(0, os.SEEK_END)
 
 		for item in channels[channel][day]:
 			out_file.write("<p>%s <span style=\"color: %s\">&lt;%s&gt;</span> %s</p>" % (item.get_time(),item.get_user_color(),item.get_user(),item.get_text()))
