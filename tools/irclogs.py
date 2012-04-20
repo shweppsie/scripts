@@ -4,8 +4,8 @@ import os, gzip, re, hashlib, sys
 from time import strftime, strptime, mktime
 
 # start and end of each html file
-start = """
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+start = \
+"""<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 	<head>
 		<title>IRC Logs</title>
@@ -15,8 +15,8 @@ start = """
 	<body>
 """
 # Don't modify end unless you know what you're doing!!!
-end = """
-	</body>
+end = \
+"""	</body>
 </html>
 """
 
@@ -219,11 +219,13 @@ for channel in channels:
 			out_file.seek(0, os.SEEK_END)
 
 		for item in channels[channel][day]:
-			out_file.write("<p>%s <span style=\"color: %s\">&lt;%s&gt;</span> %s</p>" % (item.get_time(),item.get_user_color(),item.get_user(),item.get_text()))
+			out_file.write("\t\t<p>%s <span style=\"color: %s\">&lt;%s&gt;</span> %s</p>\n" % (item.get_time(),item.get_user_color(),item.get_user(),item.get_text()))
 			last_update = item.get_ticks()
 		
 		#write the end to the file
 		out_file.write(end)
+
+#TODO: Building some nice index pages
 
 # save the timestamp from the last item
 output = open(UPDATE_FILE,'w')
