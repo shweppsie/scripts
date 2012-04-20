@@ -48,10 +48,12 @@ class LogEntry:
 		return '"%s %s: <%s> %s"' % (self.get_time(),self.channel,self.user,self.text)
 
 	def get_channel(self,nohash=False):
+		channel = None
 		if nohash and self.channel.startswith("#"):
-			return self.channel[1:]
+			channel = self.channel[1:]
 		else:
-			return self.channel
+			channel = self.channel
+		return self.__fix_html(channel)
 
 	def get_ticks(self):
 		return mktime(self.time)
@@ -63,7 +65,7 @@ class LogEntry:
 		return strftime("%Y-%m-%d",self.time)
 
 	def get_user(self):
-		return self.user
+		return self.__fix_html(self.user)
 
 	def get_user_color(self):
 		return "#%s%s%s" % (hashlib.md5(self.user).hexdigest()[0:2], hashlib.md5(self.user).hexdigest()[2:4], hashlib.md5(self.user).hexdigest()[4:6])
@@ -75,10 +77,7 @@ class LogEntry:
 		if raw:
 			return self.text
 		else:
-			text = self.text
-			replace = [("<","&lt;"),(">","&gt;"),("&","&amp;")]
-			for i in replace:
-				text = text.replace(i[0],i[1])
+			text = self.__fix_html(self.text)
 			urls = url.findall(text)
 			for link in urls:
 				if link.startswith('http://geek.cn/') and self.user == 'tinybot':
@@ -86,6 +85,16 @@ class LogEntry:
 				else:
 					text = text.replace(link,'<a href="%s">%s</a>' % (link,link))
 			return text
+
+	def __fix_html(self, text):
+		html_escape_table = {
+			"&": "&amp;",
+			'"': "&quot;",
+			"'": "&apos;",
+			">": "&gt;",
+			"<": "&lt;",
+		}
+		return "".join(html_escape_table.get(c,c) for c in text)
 
 ################################################
 #                   FUNCTIONS                  #
