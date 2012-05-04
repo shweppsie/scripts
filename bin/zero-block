@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function usage {
-	echo "Usage: ./fixdisk lba_of_error disk"
+	echo "Usage: ./$0 lba_of_error disk"
 	exit 1
 }
 
