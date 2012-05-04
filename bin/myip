@@ -1,0 +1,3 @@
+#!/bin/sh
+
+wget -q checkip.dyndns.com --output-document=-  | grep -o "Current IP Address: [0-9\.]*"
