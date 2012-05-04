@@ -1,7 +1,5 @@
 #!/bin/bash
 
-destination="/sdcard/Music"
-
 adb_status=`pidof adb | wc -l`
 if [ $adb_status -eq 0 ]; then
 	echo "adb not running. Please start adb and re-run this script."
@@ -22,6 +20,8 @@ fi
 shift
 
 while (( "$#" )); do
+	destination="/sdcard/Music"
+
 	source_dir="`cd \"$1\"; pwd`"
 
 	echo "Source: $source_dir"
@@ -43,7 +43,7 @@ while (( "$#" )); do
 			continue
 		fi
 
-		destination="$destination/$artist - $album"
+		destination="$destination/$artist/$album"
 	elif [ "$process" == "other" ]; then
 		folder=`basename "$source_dir"`
 		destination="$destination/$folder"
@@ -55,7 +55,7 @@ while (( "$#" )); do
 
 	ls "$source_dir" | while read line; do
 		echo -n "copying $line..."
-		output=`adb push "$source_dir/$line" "$destination/$output_dir/$line" 2>&1`
+		output=`adb push "$source_dir/$line" "$destination/$line" 2>&1`
 		echo "done [$output]"
 	done
 
