@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ "$#" -ne 2 ]; then
+	echo "Usage: $0 host:source destination"
+	exit 1
+fi
+
+screen rsync --partial --size-only --rsh=ssh --compress --recursive --links --human-readable "$1" "$2"
+
