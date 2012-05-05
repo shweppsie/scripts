@@ -43,7 +43,7 @@ def processTV(path,debug=False):
 		return failed(fullpath,"Season Folder Name does not meet spec")
 		
 	# check filename
-	match = re.match(r'(.*) - ([0-9]{1,2}x([0-9]{2}))( - .*)?\.[^.]+$',filename)
+	match = re.match(r'(.*) - ([0-9]{1,2}(x([0-9]{2}))+)( - .*)?\.[^.]+$',filename)
 	if not match:
 		return failed(fullpath,"Filename does not meet spec")
 	
