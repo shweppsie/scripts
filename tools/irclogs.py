@@ -3,6 +3,8 @@
 import os, gzip, re, hashlib, sys
 from time import strftime, strptime, mktime
 
+TEST = False
+
 # start and end of each html file
 start = \
 """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -61,6 +63,15 @@ class LogEntry:
 	def get_time(self):
 		return strftime("%a %d %b %Y %X",self.time)
 
+	def get_year(self):
+		return self.time.tm_year
+
+	def get_month(self):
+		return self.time.tm_mon
+
+	def get_day(self):
+		return self.time.tm_mday
+
 	def get_date(self):
 		return strftime("%Y-%m-%d",self.time)
 
@@ -100,23 +111,65 @@ class LogEntry:
 #                   FUNCTIONS                  #
 ################################################
 
-def get_channels(log):
-	channels = {}
+def get_lines(log):
+	entries = {}
+
+	# get_ticks returns the time in seconds
+	# since the epoch. We then sort the list
+	# based on this.
+	sorted(log, key=lambda line: line.get_ticks())
+
 	for line in log:
 		chan = line.get_channel(nohash=True)
-		if chan not in channels:
-			channels[chan] = []
-		channels[chan].append(line)
-	return channels
+		year = line.get_year()
+		month = line.get_month()
+		day = line.get_day()
+		if chan not in entries:
+			entries[chan] = {}
+		if year not in entries[chan]:
+			entries[chan][year] = {}
+		if month not in entries[chan][year]:
+			entries[chan][year][month] = {}
+		if day not in entries[chan][year][month]:
+			entries[chan][year][month][day] = []
+		entries[chan][year][month][day].append(line)
+	return entries
 
-def get_days(log):
-	days = {}
-	for line in log:
-		date = line.get_date()
-		if date not in days:
-			days[date] = []
-		days[date].append(line)
-	return days
+def write_day(chan,year,month,day,lines):
+	global TEST
+
+	# create directory if necessary
+	chandir = os.path.join(OUTDIR,channel,"%04d-%02d" % (year,month))
+	if not os.path.isdir(chandir):
+		os.makedirs(chandir)
+
+	date = "%04d-%02d-%02d" % (year, month, day)
+	filename = os.path.join(chandir,date)+'.html'
+
+	if TEST:
+		print "FILE: %s" % filename
+		out_file = sys.stdout
+	else:
+		# create or append file
+		if not os.path.exists(filename):
+				out_file = open(filename,'w')
+				out_file.write(start)
+		else:
+			out_file = open(filename,'rw+')
+			# seek back before the end text
+			out_file.seek(len(end)*(-1), os.SEEK_END)
+			# truncate off the old file ending
+			out_file.truncate()
+			# make sure we're at the end of the file
+			out_file.seek(0, os.SEEK_END)
+
+	# write the items out
+	for line in lines:
+		out_file.write("\t\t<p>%s <span style=\"color: %s\">&lt;%s&gt;</span> %s</p>\n" % (line.get_time(),line.get_user_color(),line.get_user(),line.get_text()))
+		last_update = line.get_ticks()
+
+	# write the end to the file
+	out_file.write(end)
 
 ################################################
 #                    SCRIPT                    #
@@ -177,58 +230,30 @@ for path in files:
 					text = res.group(5)
 
 					item = LogEntry(time,channel,user,host,text)
-					
+
+
+					#TODO: Bail if the timestamp is too old
+                                        # this requires the files to be in order
 					if item.get_ticks() > last_update:
 						log.append(item)
 	finally:
 		f.close()
 
-
-# get_ticks returns the time in seconds
-# since the epoch. We then sort the list
-# based on this.
-log = sorted(log, key=lambda line: line.get_ticks())
-
-# break the log into channels
-channels = get_channels(log)
-
 # break the log into days
-for chan in channels.keys():
-	channels[chan] = get_days(channels[chan])
+log = get_lines(log)
 
-for channel in channels:
-	# create directory if necessary
-	chandir = os.path.join(OUTDIR,channel)
-	if not os.path.isdir(chandir):
-		os.makedirs(chandir)
-
-	for day in channels[channel]:
-		filename = os.path.join(chandir,day)+'.html'
-
-		# append or create file
-		if not os.path.exists(filename):
-			out_file = open(filename,'w')
-			out_file.write(start)
-		else:
-			out_file = open(filename,'rw+')
-			# seek back before the end text
-			out_file.seek(len(end)*(-1), os.SEEK_END)
-			# truncate off the old file ending
-			out_file.truncate()
-			# make sure we're at the end of the file
-			out_file.seek(0, os.SEEK_END)
-
-		for item in channels[channel][day]:
-			out_file.write("\t\t<p>%s <span style=\"color: %s\">&lt;%s&gt;</span> %s</p>\n" % (item.get_time(),item.get_user_color(),item.get_user(),item.get_text()))
-			last_update = item.get_ticks()
-		
-		#write the end to the file
-		out_file.write(end)
+# write out the logs
+for channel in log.keys():
+	for year in log[channel].keys():
+		for month in log[channel][year].keys():
+			for day in log[channel][year][month].keys():
+				write_day(channel, year, month, day, log[channel][year][month][day])
 
 #TODO: Building some nice index pages
 
 # save the timestamp from the last item
-output = open(UPDATE_FILE,'w')
-output.write(str(last_update))
-output.close()
+if not TEST:
+	output = open(UPDATE_FILE,'w')
+	output.write(str(last_update))
+	output.close()
 
