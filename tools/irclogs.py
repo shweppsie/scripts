@@ -231,9 +231,6 @@ for path in files:
 
 					item = LogEntry(time,channel,user,host,text)
 
-
-					#TODO: Bail if the timestamp is too old
-                                        # this requires the files to be in order
 					if item.get_ticks() > last_update:
 						log.append(item)
 	finally:
