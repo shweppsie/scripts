@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import os, gzip, re, hashlib, sys
-from time import strftime, strptime, mktime
+from time import strftime, strptime, mktime, localtime
 
 TEST = False
 
@@ -37,7 +37,7 @@ url = re.compile('(http://[^ ]*)')
 
 class LogEntry:
 	def __init__(self, time, channel, user, host, text):
-		self.time = time
+		self.time = strptime(time, '%a %b %d %H:%M:%S %Y')
 		self.channel = channel
 		self.user = user
 		self.host = host
@@ -201,10 +201,15 @@ log = []
 
 # We've already process everything up to this timestamp
 last_update = 0
-if os.path.exists(UPDATE_FILE):
-	output = open(UPDATE_FILE,'r')
-	last_update = float(output.read())
-	output.close()
+new_last_update = 0
+try:
+	if os.path.exists(UPDATE_FILE):
+		output = open(UPDATE_FILE,'r')
+		last_update = float(output.read())
+		new_last_update = last_update
+		output.close()
+except:
+	pass
 
 # process log files
 for path in files:
@@ -223,7 +228,7 @@ for path in files:
 				# only process certain channels
 				if channel in ['#chat']:
 					# add LogEntry item
-					time = strptime(res.group(1), '%a %b %d %H:%M:%S %Y')
+					time = res.group(1)
 					channel = channel
 					user = res.group(3)
 					host = res.group(4)
@@ -231,7 +236,10 @@ for path in files:
 
 					item = LogEntry(time,channel,user,host,text)
 
+					# only get newer lines
 					if item.get_ticks() > last_update:
+						if item.get_ticks() > new_last_update:
+							new_last_update = item.get_ticks()
 						log.append(item)
 	finally:
 		f.close()
@@ -251,6 +259,6 @@ for channel in log.keys():
 # save the timestamp from the last item
 if not TEST:
 	output = open(UPDATE_FILE,'w')
-	output.write(str(last_update))
+	output.write(str(new_last_update))
 	output.close()
 
