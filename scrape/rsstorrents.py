@@ -106,6 +106,11 @@ def check_feeds():
 		
 		# go fetch the rss feed
 		rss = feedparser.parse(url)
+
+		if rss['status'] == 503:
+			print 'Error: Feed returned 503 (Service Unavailable)'
+			data[name]['status'] = 'Error: Feed returned 503 (Service Unavailable)'
+			continue
 		
 		matched = False
 
