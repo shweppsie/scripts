@@ -95,12 +95,15 @@ def _add_torrent(torrent):
 		raise AddTorrentException(errors)
 
 def check_feeds():
+	print "Starting Check: %s" % time.ctime()
 	data = _read_datafile()
 	for key in data:
 		feed = data[key]
 		name = key
 		url = feed['url']
 		last_updated = time.gmtime(feed['last_updated'])
+
+		print "Checking: %s" % name
 		
 		# go fetch the rss feed
 		rss = feedparser.parse(url)
