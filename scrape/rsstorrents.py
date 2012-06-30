@@ -42,7 +42,7 @@ class NoSuchFeedException(Exception):
 def showrss(data,last_updated):
 	torrents = []
 	for entry in data.entries:
-		if entry.published_parsed > last_updated:
+		if entry.updated_parsed > last_updated:
 			torrents.append(entry['links'][0]['href'])
 	return torrents
 
