@@ -19,12 +19,11 @@
 # script to parse an rss feed of torrents and add them as they become availble
 # the script relies on being called at regular intervals usually via cron
 
+import subprocess, sys, os, re
 import feedparser
 import time
 import calendar
-import os.path
 import json
-import re
 
 DATAFILE = '/etc/rsstorrents.json'
 
@@ -88,7 +87,6 @@ def _write_datafile(data):
 	f.close()
 
 def _add_torrent(torrent):
-	import subprocess,sys
 	args = ["/usr/local/bin/transmission-remote","donbot","-a","%s" % torrent]
 	(output,errors) = subprocess.Popen(args, stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
 	if output != "" and not output.find('success'):
