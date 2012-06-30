@@ -40,7 +40,11 @@ class NoSuchFeedException(Exception):
 		return "No Such Feed: %s" % self.value
 
 def showrss(data,last_updated):
-	raise Exception("ShowRSS not yet implemented")
+	torrents = []
+	for entry in data.entries:
+		if entry.published_parsed > last_updated:
+			torrents.append(entry['links'][0]['href'])
+	return torrents
 
 def ezrss(data,last_updated):
 	torrents = []
