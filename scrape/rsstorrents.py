@@ -31,7 +31,7 @@ class AddTorrentException(Exception):
 	def __init__(self, error_text):
 		self.error_text = error_text
 	def __str__(self):
-		return error_text
+		return self.error_text.decode('ascii')
 
 class NoSuchFeedException(Exception):
 	def __init__(self,value):
