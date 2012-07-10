@@ -11,7 +11,7 @@ if len(sys.argv) == 3:
 		print mktime(strptime(sys.argv[2], "%H:%M:%S %d-%m-%y"))
 		exit(0)
 
-print "Usage: %s MODE TIME"
+print "Usage: %s MODE TIME" % sys.argv[0]
 print "Convert from a unix time stamp to a readable time"
 print "Mode can be either the string 'to' or 'from'"
 print ""
