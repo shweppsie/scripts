@@ -1,9 +1,31 @@
 #!/bin/bash
 
-ls | egrep -- "${1}"| while read line
+noact=0
+
+while getopts ":n" opt
 do
-	newname="`echo "${line}" | sed -- "s/${1}/${2}/g"`"
+	case $opt in
+		n)
+			echo "-n: no action will be taken!" >&2
+			noact=1
+		;;
+		\?)
+			echo "Invalid option: -$OPTARG" >&2
+			exit 1
+		;;
+	esac
+done
+
+shift $((OPTIND-1))
+
+echo "Replace \"${1}\" with \"${2}\""
+
+ls | grep -E -- "${1}"| while read line
+do
+	newname="`echo "${line}" | sed -r -- "s/${1}/${2}/g"`"
 	echo "${line} -> ${newname}"
-	mv -- "${line}" "${newname}"
+	if [ $noact -eq 0 ]; then
+		mv -- "${line}" "${newname}"
+        fi
 done
 
