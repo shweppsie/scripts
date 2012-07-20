@@ -23,25 +23,29 @@ class Log:
 
 def parse_args():
 	parser = argparse.ArgumentParser(description='Transfer files')
-	parser.add_argument('--stop-time', dest='stop_time', default=7,
-			help="Hour to stop downloads")
-	parser.add_argument('--stdout', dest='stdout', action='store_true',
+	parser.add_argument('--stop-time', dest='stop_time', default=30,
+			help="hour to stop downloads")
+	parser.add_argument('--log', dest='logfile',
 			help="output to stdout")
 	parser.add_argument('source', help="Rsync source path")
 	parser.add_argument('destination', help="Rsync destination path")
 	return parser.parse_args()
 
+# parse arguments
 args = parse_args()
 
-#first arg is source
-source = args.source
+# deal with optional arguments
+stop_hour = int(args.stop_time)
 logfile = args.logfile
 
+# deal with mandatory arguments
+source = args.source
+destination = args.destination
 
-stop_hour = int(args.stop_time)
 # prepare logging
 log = Log(logfile)
 
+# check time
 if time.localtime().tm_hour >= stop_hour:
 	log.write("Not Starting. Already after stop time of %d:00." % stop_hour)
 	exit(1)
@@ -65,7 +69,7 @@ if len(download_files) == 0:
 
 downloads.extend(download_files)
 
-downloads.append(args.destination)
+downloads.append(destination)
 
 log.write(repr(downloads))
 
