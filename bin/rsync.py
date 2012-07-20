@@ -50,8 +50,9 @@ if time.localtime().tm_hour >= stop_hour:
 	log.write("Not Starting. Already after stop time of %d:00." % stop_hour)
 	exit(1)
 else:
-	log('Using a stop time of %d:00' % stop_hour)
 	log.write('\nStarting Download')
+	if stop_hour < 24:
+		log.write('Using a stop time of %d:00' % stop_hour)
 
 DOWNLOADS_FILE = os.path.join(destination,'downloads.txt')
 
