@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, time
+import os, sys, time
 import subprocess
 import argparse
 
@@ -53,7 +53,7 @@ else:
 	log('Using a stop time of %d:00' % stop_hour)
 	log.write('\nStarting Download')
 
-DOWNLOADS_FILE = '/stuff/shared/downloads/donbot/downloads.txt'
+DOWNLOADS_FILE = os.path.join(destination,'downloads.txt')
 
 downloads = ['/usr/bin/rsync','--size-only','-r','-vv','--password-file','.donbot.rsync']
 download_files = []
