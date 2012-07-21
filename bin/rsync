@@ -115,7 +115,7 @@ for i in xrange(5):
 			log.write("Stopping...7am limit reached")
 			exit(1)
 		#re-check in a minute
-		time.sleep(60)
+		time.sleep(10)
 	if p.returncode == 0:
 		log.write("Downloads Completed Successfully")
 		exit(0)
