@@ -4,6 +4,8 @@ import os, sys, time
 import subprocess
 import argparse
 
+import ConfigParser
+
 class Log:
 	def __init__(self, logfile):
 		self.fileno = sys.stdout.fileno
@@ -21,17 +23,26 @@ class Log:
 		self.logfile.flush()
 		self.logfile.close()
 
+def parse_config():
+	config = ConfigParser.SafeConfigParser()
+	config.add_section('rsync-downloader')
+	config.set('rsync-downloader', 'source', '')
+	config.set('rsync-downloader', 'destination', '')
+	config.read(os.path.expanduser('~/.rsync-downloader'))
+	return config
+
 def parse_args():
 	parser = argparse.ArgumentParser(description='Transfer files')
 	parser.add_argument('--stop-time', dest='stop_time', default=30,
 			help="hour to stop downloads")
 	parser.add_argument('--log', dest='logfile',
 			help="output to stdout")
-	parser.add_argument('source', help="Rsync source path")
-	parser.add_argument('destination', help="Rsync destination path")
+	parser.add_argument('--source', help="Rsync source path")
+	parser.add_argument('--destination', help="Rsync destination path")
 	return parser.parse_args()
 
 # parse arguments
+config = parse_config()
 args = parse_args()
 
 # deal with optional arguments
@@ -39,8 +50,21 @@ stop_hour = int(args.stop_time)
 logfile = args.logfile
 
 # deal with mandatory arguments
-source = args.source
-destination = args.destination
+if args.source:
+	source = args.source
+elif config.get('rsync-downloader','source') != '':
+	source = config.get('rsync-downloader','source')
+else:
+	print "Unknown source path!"
+	exit(1)
+
+if args.destination:
+	destination = args.destination
+elif config.get('rsync-downloader','destination') != '':
+	destination = config.get('rsync-downloader','destination')
+else:
+	print "Unknown destination path!"
+	exit(1)
 
 # prepare logging
 log = Log(logfile)
