@@ -84,7 +84,7 @@ else:
 
 DOWNLOADS_FILE = os.path.join(destination,'downloads.txt')
 
-downloads = ['/usr/bin/rsync','--size-only','-r','-vv','--password-file','.donbot.rsync']
+downloads = ['/usr/bin/rsync','--size-only','-r','-vv','--password-file','~/.password.rsync']
 download_files = []
 
 for i in open(DOWNLOADS_FILE).read().split('\n'):
