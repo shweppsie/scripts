@@ -1,3 +1,0 @@
-#!/bin/sh
-
-wakeonlan -i 192.168.99.255 bc:ae:c5:21:c5:e5
