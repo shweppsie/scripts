@@ -100,39 +100,45 @@ def _add_torrent(torrent):
 	elif errors != "":
 		raise AddTorrentException(errors)
 
+def _msg_irc(text, quittext=""):
+	args = ["/home/nathan/src/donbot/rsstorrents",text,quittext]
+	subprocess.Popen(args, stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
+
 def check_feeds():
 	print "Starting Check: %s" % time.ctime()
 	data = _read_datafile()
-	for key in data:
-		feed = data[key]
-		name = key
+	for name in data.keys():
+		feed = data[name]
 		url = feed['url']
-		last_updated = time.gmtime(feed['last_updated'])
-
-		print "Checking: %s" % name
-		
-		# go fetch the rss feed
-		rss = feedparser.parse(url)
-
-		if rss['status'] == 503:
-			print 'Error: Feed returned 503 (Service Unavailable)'
-			data[name]['status'] = 'Error: Feed returned 503 (Service Unavailable)'
-			continue
+		last_updated = feed['last_updated']
 		
 		matched = False
 
 		for m in func_mapper:
 			if re.match(m['url'],url):
 				matched = True
-				for torrent in m['func'](rss,last_updated):
-					print "Adding: %s" % torrent
+
+				print "Checking: %s using (%s)" % (name, m['func'].__name__)
+
+				# go fetch the rss feed
+				rss = feedparser.parse(url)
+
+				if 'status' in rss and rss['status'] == 503:
+					print 'Error: Feed returned 503 (Service Unavailable)'
+					data[name]['status'] = 'Error: Feed returned 503 (Service Unavailable)'
+					break
+
+				for title,torrent,posttime in m['func'](rss,last_updated):
+					print 'Adding: "%s" | "%s"' % (name, torrent)
 					try:
 						_add_torrent(torrent)
 					except AddTorrentException, e:
 						data[name]['status'] = str(e)
 						_write_datafile(data)
 						raise
-				data[name]['last_updated'] = time.time()
+					if posttime > last_updated:
+						last_updated = posttime
+				data[name]['last_updated'] = last_updated
 				data[name]['status'] = 'updated last %s' % time.strftime("on the %d %b %Y at %H:%M:%S", time.localtime())
 				break
 		if not matched:
