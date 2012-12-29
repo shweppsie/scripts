@@ -64,7 +64,7 @@ func_mapper = [
 		'url':r'^http://www.ezrss.it/search/index.php\?(((show_name|show_name_exact|date|quality|quality_exact|release_group)=[^&]*|simple)&)*mode=rss$',
 		'func':ezrss
 	},{
-		'url':r'^http://showrss.karmorra.info/feeds/[0-9]*.rss',
+		'url':r'^http://showrss\.karmorra\.info/(feeds/.*\.rss|rss\.php\?user_id=[0-9]*([^=]*=[^&]*)*)',
 		'func':showrss
 	}
 ]
