@@ -26,6 +26,7 @@ import calendar
 import json
 
 DATAFILE = '/etc/rsstorrents.json'
+IRC_ANNOUNCE = True
 
 class AddTorrentException(Exception):
 	def __init__(self, error_text):
@@ -136,6 +137,8 @@ def check_feeds():
 						data[name]['status'] = str(e)
 						_write_datafile(data)
 						raise
+					if IRC_ANNOUNCE == True:
+						_msg_irc('Adding "%s" to transmission' % title, "Posted at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.localtime()))
 					if posttime > last_updated:
 						last_updated = posttime
 				data[name]['last_updated'] = last_updated
