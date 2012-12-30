@@ -4,16 +4,17 @@ import sys
 from time import *
 
 if len(sys.argv) == 3:
-	if sys.argv[1] == "human":
+	if sys.argv[1] == "unix":
 		print strftime("%H:%M:%S %d-%m-%y", localtime(float(sys.argv[2])))
 		exit(0)
-	elif sys.argv[1] == "unix":
+	elif sys.argv[1] == "human":
 		print mktime(strptime(sys.argv[2], "%H:%M:%S %d-%m-%y"))
 		exit(0)
 
 print "Usage: %s MODE TIME" % sys.argv[0]
-print "Convert from a unix time stamp to a readable time"
-print "Mode can be either the string 'to' or 'from'"
+print "Convert between a unix timestamp and human readable time"
+print "Mode can be either the string 'human' or 'unix' defining the provided"
+print "format"
 print ""
 print "human: 1340455142.0"
 print "unix: 'HH:MM:SS DD-MM-YY'"
