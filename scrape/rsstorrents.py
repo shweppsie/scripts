@@ -44,7 +44,7 @@ def showrss(data,last_updated):
 	torrents = []
 	for entry in data.entries:
 		posttime = entry.published_parsed
-		if entry.updated_parsed:
+		if 'updated_parsed' in dir(entry):
 			posttime = entry.updated_parsed
 		posttime = calendar.timegm(posttime)
 		if posttime > last_updated:
@@ -55,7 +55,7 @@ def ezrss(data,last_updated):
 	torrents = []
 	for entry in data.entries:
 		posttime = entry.published_parsed
-		if entry.updated_parsed:
+		if 'updated_parsed' in dir(entry):
 			posttime = entry.updated_parsed
 		posttime = calendar.timegm(posttime)
 		if posttime > last_updated:
