@@ -43,7 +43,10 @@ class NoSuchFeedException(Exception):
 def showrss(data,last_updated):
 	torrents = []
 	for entry in data.entries:
-		posttime = calendar.timegm(entry.updated_parsed)
+		posttime = entry.published_parsed
+		if entry.updated_parsed:
+			posttime = entry.updated_parsed
+		posttime = calendar.timegm(posttime)
 		if posttime > last_updated:
 			torrents.append((entry['title'],entry['links'][0]['href'], posttime))
 	return torrents
@@ -51,7 +54,10 @@ def showrss(data,last_updated):
 def ezrss(data,last_updated):
 	torrents = []
 	for entry in data.entries:
-		posttime = calendar.timegm(entry.updated_parsed)
+		posttime = entry.published_parsed
+		if entry.updated_parsed:
+			posttime = entry.updated_parsed
+		posttime = calendar.timegm(posttime)
 		if posttime > last_updated:
 			# either get a magnet or torrent link
 			if 'magneturi' in  entry.keys() and _check_magnet(entry['magneturi']):
