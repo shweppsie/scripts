@@ -6,6 +6,8 @@ f = open(sys.argv[1]).read()
 
 f = f.splitlines()
 
+f = f[1:]
+
 spend = {}
 
 startdate = ""
