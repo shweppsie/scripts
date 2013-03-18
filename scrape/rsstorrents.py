@@ -107,9 +107,12 @@ def _add_torrent(torrent):
 	elif errors != "":
 		raise AddTorrentException(errors)
 
-def _msg_irc(text, quittext=""):
-	args = ["/home/nathan/src/donbot/rsstorrents",text,quittext]
-	subprocess.Popen(args, stdout=subprocess.PIPE,stderr=subprocess.PIPE).communicate()
+def _msg_irc(text):
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect(('localhost', 2551))
+    s.sendall(text)
+    s.close()
 
 def check_feeds():
 	print "Starting Check: %s" % time.ctime()
@@ -144,7 +147,7 @@ def check_feeds():
 						_write_datafile(data)
 						raise
 					if IRC_ANNOUNCE == True:
-						_msg_irc('Adding "%s" to transmission' % title, "Posted at %s" % time.strftime("%H:%M:%S %d-%m-%Y", time.localtime()))
+						_msg_irc('Adding "%s" to transmission' % title)
 					if posttime > last_updated:
 						last_updated = posttime
 				data[name]['last_updated'] = last_updated
