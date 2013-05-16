@@ -6,8 +6,8 @@ import sys,os,re
 #TODO: detect empty folders
 #TODO: detect missing episodes from a Season
 
-season = re.compile(r'(Specials|Season (0[1-9]|[1-9][0-9]))')
-tv = re.compile(r'(.*) - ([0-9]{1,2})(x([0-9]{2,3}))+( - .*)?\.[^.]+$')
+season = re.compile(r'^(Specials|Season (0[1-9]|[1-9][0-9]|(20|19)[0-9][0-9]))$')
+tv = re.compile(r'^(.*) - ([0-9]{1,4})(x([0-9]{2,3}))+( - .*)?\.[^.]+$')
 
 def failed(path, reason):
     print "Failed (%s): %s" % (reason,path)
