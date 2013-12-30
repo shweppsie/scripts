@@ -1,0 +1,44 @@
+#!/usr/bin/env python
+
+import os, sys, subprocess
+
+def add(*options):
+	global command
+	for o in options:
+		command.append(o)
+
+command = []
+
+if os.getuid() != 0:
+	print "Please run this script as root"
+	exit(1)
+
+# Update css first
+r = subprocess.call(['/usr/bin/sudo','-u','gameserver','/scratch/Steam/srcds/steam','-command','update','-game','Counter-Strike Source','-dir','/scratch/gameservers/Steam/srcds'])
+if r != 0:
+	print "Updating failed!"
+	exit(1)
+
+# Change to less privileged user
+add('/usr/bin/sudo','-u','gameserver')
+
+# Run server in a screen
+add('/usr/bin/screen','-d','-m','-S','css')
+
+# Game Executable
+add('/scratch/gameservers/Steam/srcds/css/srcds_run')
+
+# Command Line Options
+add('-game','cstrike') #Specifies which game/mod to run
+add('-steambin','/scratch/gameservers/Steam/srcds/steam') #Path to Steam binary
+add('-ip','0.0.0.0') #Specifies the address to use for the bind(2) syscall
+add('-port','27015') #Specifies which port to open for client connections
+add('-maxplayers','32') #Specifies how many player slots the server can contain
+add('-nohltv') #Disables SourceTV
+add('-insecure') #Disables Valve Anti-Cheat technology
+
+add('+map','mcdonalds-mds') #server requires a map to start
+
+print command
+
+subprocess.call(command)
