@@ -103,6 +103,8 @@ virsh --connect lxc:/// destroy ${name}
 # set VM to autostart
 virsh --connect lxc:/// autostart ${name}
 
+# TODO: <target dev='vm-${name}'/>
+
 # start vm
 virsh --connect lxc:/// start ${name}
 
