@@ -3,6 +3,11 @@
 # enable bash debugging
 #set -x
 
+if [ "`which virsh`" == "" ]; then
+	echo "Can't find virsh! Is this the right machine?"
+	exit 1
+fi
+
 dir="/img"
 user="nathan"
 uid="`id -u ${user}`"
