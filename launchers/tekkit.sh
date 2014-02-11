@@ -12,9 +12,9 @@ if [ $UID -ne 0 ]; then
 	exit 1
 fi
 
-NAME='minecraft-tekkit-lite' # name of screen session
-USER='gameserver' # user to run application as
-WD="/scratch/tekkit-lite/" # working directory will be set to this
+NAME='minecraft-tekkit' # name of screen session
+USER='game' # user to run application as
+WD="/gameservers/tekkit" # working directory will be set to this
 BIN="/usr/bin/java" # binary to run
 ARGS="-Xms${START_MEM} -Xmx${MAX_MEM} -jar ${JAR} nogui" # arguments
 
