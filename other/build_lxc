@@ -80,7 +80,7 @@ sed -i 's/$ModLoad imklog/#$ModLoad imklog/' ${dir}/etc/rsyslog.conf
 useradd --root ${dir} --create-home --shell /bin/bash --uid ${uid} ${user} 
 
 # add sudo for primary user
-usermod --root ${dir} --append --groups sudo ${user}
+$CR gpasswd --add nathan sudo
 
 # copy user definiton from host
 sed -i "/${user}/d" ${dir}/etc/passwd
