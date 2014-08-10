@@ -10,7 +10,7 @@ do
 		show=`echo ${name} | sed 's/\(.*\) - [0-9]*x[0-9]* - .*/\1/g'`
 		
 		# Put the at the end of the show name
-		show=`echo ${show} | sed 's/The \(.*\)/\1, The/g'`
+		show=`echo ${show} | sed 's/^The \(.*\)/\1, The/g'`
 
 		# Get the season number
     	season=`echo ${name} | sed 's/.* - \([0-9]*\)x[0-9]* - .*/\1/g'`
