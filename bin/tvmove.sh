@@ -18,8 +18,10 @@ do
 		# Pad the season number to 2 digits
     	season=`printf "%02d\n" $season`
 
-    	echo "${name} -> ${show}/Season ${season}/"
-    	mv -i "${file}" "/stuff/shared/videos/tv/${show}/Season ${season}/"
+
+    	echo "${name} -> ${show}/${season}/"
+		mkdir -vp "/stuff/shared/videos/tv/${show}/${season}/"
+    	mv -i "${file}" "/stuff/shared/videos/tv/${show}/${season}/"
 	else
 		echo "Name does not match regex: ${name}"
     fi
