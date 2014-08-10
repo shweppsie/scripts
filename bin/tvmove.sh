@@ -15,8 +15,15 @@ do
 		# Get the season number
     	season=`echo ${name} | sed 's/.* - \([0-9]*\)x[0-9]* - .*/\1/g'`
 
-		# Pad the season number to 2 digits
-    	season=`printf "%02d\n" $season`
+		# catch specials
+		if [ $season -eq 0 ]
+		then
+			season="Specials"
+		else
+			# Pad the season number to 2 digits
+			season=`printf "%02d\n" $season`
+			season="Season ${season}"
+		fi
 
 
     	echo "${name} -> ${show}/${season}/"
