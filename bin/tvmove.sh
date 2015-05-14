@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ "$1" == "--auto" ]; then
+	auto=true
+	shift
+else
+	auto=false
+fi
+
 for file in "$@"
 do
     name="`basename "${file}"`"
@@ -26,6 +33,16 @@ do
 		fi
 
 		dest="/stuff/shared/videos/tv/${show}/${season}"
+
+		# check for rejects
+		if [ "$auto" == true ]
+		then
+			if ! grep -Fxq "${show}" /stuff/shared/downloads/auto.txt
+			then
+				echo "Not in auto file, moving to /stuff/shared/downloads/rejects/"
+				dest="/stuff/shared/downloads/rejects"
+			fi
+		fi
 
 		# check for dups
 		if [ -e "${dest}/${name%.*}"* ]
