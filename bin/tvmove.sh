@@ -25,10 +25,38 @@ do
 			season="Season ${season}"
 		fi
 
+		dest="/stuff/shared/videos/tv/${show}/${season}"
 
-    	echo "${name} -> ${show}/${season}/"
-		mkdir -vp "/stuff/shared/videos/tv/${show}/${season}/"
-    	mv -i "${file}" "/stuff/shared/videos/tv/${show}/${season}/"
+		# check for dups
+		if [ -e "${dest}/${name%.*}"* ]
+		then
+			echo "Duplicate!"
+
+			new="`du -shm "${file}"`"
+			old="`du -shm "${dest}/${name%.*}"*`"
+
+			new="`echo $new | cut -f 1 -d' '`"
+			old_name="`echo $old | cut -f 2- -d' '`"
+			old="`echo $old | cut -f 1 -d' '`"
+
+			if [ $new -eq $old ]
+			then
+				echo "Files are the same size, Removing new file: ${file}"
+				rm -v "${file}"
+				continue
+			elif [ $new -le $old ]
+			then
+				echo "Old file is bigger, Removing new file: ${file}"
+				rm -v "${file}"
+				continue
+			else
+				echo "New file is bigger, Removing old file: ${old_name}"
+				rm -v "${old_name}"
+			fi
+		fi
+
+		mkdir -vp "${dest}/"
+    	mv -vi "${file}" "${dest}/"
 	else
 		echo "Name does not match regex: ${name}"
     fi
