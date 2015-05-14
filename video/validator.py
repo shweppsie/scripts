@@ -9,6 +9,14 @@ import sys,os,re
 season = re.compile(r'^(Specials|Season (0[1-9]|[1-9][0-9]|(20|19)[0-9][0-9]))$')
 tv = re.compile(r'^(.*) - ([0-9]{1,4})(x([0-9]{2,3}))+( - .*)?\.[^.]+$')
 
+def size(num):
+    for x in ['bytes','KB','MB','GB']:
+        if num < 1024.0 and num > -1024.0:
+            return "%3.1f%s" % (num, x)
+        num /= 1024.0
+    return "%3.1f%s" % (num, 'TB')
+
+
 def failed(path, reason):
     print "Failed (%s): %s" % (reason,path)
     return 1
@@ -53,6 +61,28 @@ def processTV(path):
             return failed(fullpath,"File (%s) and folder " \
                     "Season (%s) Number do not match" %
                     (file_seasonnum,folder_seasonnum) )
+
+    # Detect duplicate episodes
+    file, ext = os.path.splitext(filename)
+    path = os.path.dirname(fullpath)
+    for f in os.listdir(path):
+        if os.path.isfile(os.path.join(path,f)):
+            f, e = os.path.splitext(f)
+            ignore = ['.sfv','.srt','.nfo']
+            if f == file and e != ext and \
+                    e not in ignore and ext not in ignore:
+                filea = os.path.join(path,file+ext)
+                fileb = os.path.join(path,file+e)
+                filea = (filea, ext, \
+                        os.path.getsize(filea))
+                fileb = (fileb, e, \
+                        os.path.getsize(fileb))
+                if filea[2] > fileb[2]:
+                    file = filea
+                    filea = fileb
+                    fileb = file
+                print "Duplicate file, Remove: %s (%s, %s)" % \
+                            (filea[0], size(filea[2]), size(fileb[2]))
 
     return 0
 
