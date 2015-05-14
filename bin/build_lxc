@@ -110,6 +110,8 @@ virsh --connect lxc:/// autostart ${name}
 
 # TODO: <target dev='vm-${name}'/>
 
+# TODO: set timezone : sudo dpkg-reconfigure tzdata
+
 # start vm
 virsh --connect lxc:/// start ${name}
 
