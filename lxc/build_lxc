@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# this script creates a useable lxc container
+
+# print stractrace and quit on error
+trap err ERR
+err(){ while caller $((n++)); do :; done; }
+
+# check we have a config file first
+CWD="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ ! -f ${CWD}/config.sh ]
+then
+	echo "Not config file. Please make a config.sh to continue"
+	exit 1
+fi
+
+if [ $# -ne 5 ]
+then
+	echo "Usage: $0 ID NAME USER DISTRO RELEASE"
+	exit 1
+fi
+
+if [ $UID -ne 0 ]
+then
+	echo "Not root!"
+	exit 1
+fi
+
+id="$1"
+name="$2"
+user="$3"
+distro="$4"
+release="$5"
+
+echo "ID: ${id}"
+echo "Name: ${name}"
+echo "Primary User: ${user}"
+echo "Distro: ${distro}"
+echo "Release: ${release}"
+
+lxcdir="/lxc/${name}"
+dir="${lxcdir}/rootfs"
+
+attach_cmd="lxc-attach -n ${name} --" 
+
+if [[ -x "${dir}" ]]
+then
+	echo "${dir} already exists!"
+	exit 1
+fi
+
+CR="chroot ${dir}"
+
+# create base install
+echo "Creating base install"
+MIRROR="http://mirror.byte.net.nz/debian" lxc-create -n ${name} -t ${distro} -- -r ${release}
+if [ $? -ne 0 ]; then
+	echo "Something went wrong. :("
+	exit 1
+fi
+
+# set up dns
+echo "Configure DNS"
+echo -e "domain shwep.nz\nsearch shwep.nz shweppsie.com\nnameserver 192.168.${subnet}.254\n" > ${dir}/etc/resolv.conf
+
+# setup hostname
+echo "Configure Hostname"
+echo "127.0.0.1 $name" >> ${dir}/etc/hosts
+
+# set up interfaces file
+echo "Configure Interfaces File"
+sed -i "s/iface eth0 inet dhcp/iface eth0 inet static/g" ${dir}/etc/network/interfaces
+echo -e "\taddress 192.168.${subnet}.${id}\n\tnetmask 255.255.255.0\n\tgateway 192.168.${subnet}.254\n" >> ${dir}/etc/network/interfaces
+
+# configure interface name
+echo "Configure Interface Name"
+sed -i "s/vm-lxc-new/vm-lxc-${id}/" ${lxcdir}/config
+
+# set VM to autostart
+echo "Set VM to autostart"
+echo "lxc.start.auto = 1" >> ${lxcdir}/config
+
+# fix systemd
+# http://serverfault.com/questions/658052/systemd-journal-in-debian-jessie-lxc-container-eats-100-cpu
+
+# start vm
+lxc-start -n ${name} -d
+
+echo "Waiting for VM to boot... (10 Seconds)"
+sleep 10
+
+#
+# We want to make a basic but usable container, as guest VMs won't get all our
+# puppet niceness.
+#
+
+echo "Setting timezone and region"
+sudo sed -i 's/# en_NZ.UTF-8 UTF-8/en_NZ.UTF-8 UTF-8/' ${lxcdir}/rootfs/etc/locale.gen
+$attach_cmd locale-gen
+$attach_cmd ln -fs /usr/share/zoneinfo/Pacific/Auckland /etc/localtime
+$attach_cmd dpkg-reconfigure -f noninteractive tzdata
+
+echo "Updating apt lists"
+$attach_cmd apt-get update
+
+echo "Installing base packages"
+$attach_cmd apt-get -y install sudo apt-utils iputils-ping openssh-server
+
+echo "Add user and configure sudo"
+$attach_cmd adduser $user
+$attach_cmd gpasswd --add $user sudo
+
