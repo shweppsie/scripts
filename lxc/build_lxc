@@ -38,18 +38,18 @@ echo "Primary User: ${user}"
 echo "Distro: ${distro}"
 echo "Release: ${release}"
 
-lxcdir="/lxc/${name}"
-dir="${lxcdir}/rootfs"
+lxcdir="${lxcdir}/${name}"
+lxcroot="${lxcdir}/rootfs"
 
 attach_cmd="lxc-attach -n ${name} --" 
 
-if [[ -x "${dir}" ]]
+if [[ -x "${lxcroot}" ]]
 then
-	echo "${dir} already exists!"
+	echo "${lxcroot} already exists!"
 	exit 1
 fi
 
-CR="chroot ${dir}"
+CR="chroot ${lxcroot}"
 
 # create base install
 echo "Creating base install"
@@ -61,16 +61,16 @@ fi
 
 # set up dns
 echo "Configure DNS"
-echo -e "domain shwep.nz\nsearch shwep.nz shweppsie.com\nnameserver 192.168.${subnet}.254\n" > ${dir}/etc/resolv.conf
+echo -e "domain shwep.nz\nsearch shwep.nz shweppsie.com\nnameserver 192.168.${subnet}.254\n" > ${lxcroot}/etc/resolv.conf
 
 # setup hostname
 echo "Configure Hostname"
-echo "127.0.0.1 $name" >> ${dir}/etc/hosts
+echo "127.0.0.1 $name" >> ${lxcroot}/etc/hosts
 
 # set up interfaces file
 echo "Configure Interfaces File"
-sed -i "s/iface eth0 inet dhcp/iface eth0 inet static/g" ${dir}/etc/network/interfaces
-echo -e "\taddress 192.168.${subnet}.${id}\n\tnetmask 255.255.255.0\n\tgateway 192.168.${subnet}.254\n" >> ${dir}/etc/network/interfaces
+sed -i "s/iface eth0 inet dhcp/iface eth0 inet static/g" ${lxcroot}/etc/network/interfaces
+echo -e "\taddress 192.168.${subnet}.${id}\n\tnetmask 255.255.255.0\n\tgateway 192.168.${subnet}.254\n" >> ${lxcroot}/etc/network/interfaces
 
 # configure interface name
 echo "Configure Interface Name"
